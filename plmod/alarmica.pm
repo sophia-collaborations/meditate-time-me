@@ -89,6 +89,10 @@ sub shlc_isvol {
   return $lc_ret;
 }
 
+sub fg_invi_vol {
+  system(&shlc_isvol(@_));
+}
+
 sub advance_by_s {
   my $lc_at;
   my $lc_ref;
