@@ -5,6 +5,8 @@ use alarmica;
 my $short_alarm;
 my $end_alarm;
 
+my $nex_alarm;
+
 {
   my @lc_a;
   my @lc_b;
@@ -35,11 +37,21 @@ $bandia = &alarmica::new_res;
 
 #&alarmica::advance_by_s($bandia,60);
 
-while ( &argola::yet )
-{
+#while ( &argola::yet )
+#{
+#  &alarmica::advance_by_s($bandia,&argola::getrg);
+#  if ( &argola::yet ) { system($short_alarm); }
+#}
+
+$nex_alarm = "echo > /dev/null";
+
+sub opto__f_s {
+  system($nex_alarm);
+  $nex_alarm = $short_alarm;
   &alarmica::advance_by_s($bandia,&argola::getrg);
-  if ( &argola::yet ) { system($short_alarm); }
-}
+} &argola::setopt("-s",\&opto__f_s);
+&argola::runopts;
+
 
 system($end_alarm);
 
