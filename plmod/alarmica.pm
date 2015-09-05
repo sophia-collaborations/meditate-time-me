@@ -2,6 +2,7 @@ package alarmica;
 use strict;
 use randomica;
 use argola;
+use chobak_hook;
 
 my $resdir;
 my $soundfl;
@@ -13,6 +14,12 @@ my $ringfun;
 
 my $permitay = 0;
 my $destinay;
+
+my $hooks = {};
+
+sub fhooks {
+  return $hooks;
+}
 
 $ringfun = \&ringtalert;
 
@@ -31,11 +38,13 @@ sub ringtalert {
   my $lc_vol;
   
   $lc_ref = $_[0];
-  $lc_code = &randomica::ranstrg(8);
+  $lc_code = &randomica::ranstrg(4);
+  &findmsg($lc_code);
   $lc_vol = 0.05;
-  while ( !(findmsg($lc_code)) )
+  while ( !(&findmsg($lc_code)) )
   {
-    &outptex("\n\nRINGING AFTER TASK:\n    " . $$lc_ref{"mesg"});
+    do_s_caf(5);
+    &outptex("\n\nRINGING AFTER TASK:\n    " . $lc_ref->{"mesg"});
     &outptex("  " . $lc_code . " -- Vol=" . $lc_vol);
     fg_invi_vol($lc_vol);
     $lc_vol = ( $lc_vol * 1.02 );
@@ -105,33 +114,84 @@ sub justbesure {
   my $lc_hammer;
   my $lc_code;
   my $lc_left;
+  my $lc_ref;
+  my $lc_mesg;
+  my $lc_totrout;
+  my $lc_haltcode;
+  my $lc_start_interp;
+  
+  $lc_ref = $_[0];
+  $lc_mesg = $lc_ref->{"mesg"};
+  $lc_totrout = $lc_ref->{"rtnom"};
+  $lc_start_interp = &nowo;
   
   &findmsg("no");
+  &findmsg("halt");
   $lc_code = &randomica::ranstrg(8);
+  &findmsg($lc_code);
   
   $lc_hammer = int(&nowo + 70.2);
   
   while ( &howremain($lc_hammer,$lc_left) )
   {
-    &outptex("\n\n"
+    &do_caf(3);
+    &outptex("\n\n\n"
+      . "ROUTINE: " . $lc_totrout . ":\n"
+      . "   TASK: " . $lc_mesg . ":\n"
+      . "\n"
       . "JUST TO BE SURE YOU WANT TO INTERRUPT THE WHOLE PROCESS:\n"
-      . "  You have " . &parcesec($lc_left) . " to enter: " . $lc_code . "\n"
-      . "  (Or just \"no\" to cancel)"
+      . "  You have " . &parcesec($lc_left) . " to enter: " . $lc_code
+      . "\n" . "  (Or just \"no\" to cancel)"
+      . "\n" . "  (Or just \"halt\" to pause)"
     );
     if ( &findmsg($lc_code) )
     {
       &outptex("\nOKAY --- THE PROCESS IS OVER WITH:");
+      &chobak_hook::fsquen($hooks,"ondie","");
       exit(0);
     }
     if ( &findmsg("no") )
     {
       return;
     }
+    
+    if ( &findmsg("halt") )
+    {
+      my $lc3_stb;
+      my $lc3_stc;
+      my $lc3_wait;
+      
+      $lc3_wait = 1;
+      $lc_haltcode = &randomica::ranstrg(6);
+      &findmsg($lc_haltcode);
+      while ( ! &findmsg($lc_haltcode) )
+      {
+        $lc3_wait = int($lc3_wait - 0.8);
+        if ( $lc3_wait < 0.5 )
+        {
+          &outptex("\n\n\n"
+          . "Routine: " . $lc_ref->{"rtnom"} . ":\n"
+          . "Amidst: " . $lc_ref->{"mesg"} . ":\n"
+          . "Process in a state of halt. To undo, enter the\n"
+          . "following code:\n"
+          . "      " . $lc_haltcode );
+          $lc3_wait = 12;
+        }
+        sleep(5);
+      }
+      $lc3_stb = &nowo;
+      $lc3_stc = int(($lc3_stb - $lc_start_interp) + 60.2);
+      $lc_ref->{"at"} = int(($lc_ref->{"at"}) + 0.2 + $lc3_stc);
+      
+      return;
+    }
+    
     sleep(1);
   }
 }
 
 sub wait {
+  my $lc_totrout;
   my $lc_code;
   my $lc_prwcode;
   my $lc_ref;
@@ -141,33 +201,50 @@ sub wait {
   my $lc_endure;
   
   $lc_ref = $_[0];
-  $lc_start = $$lc_ref{"at"};
-  $lc_mesg = $$lc_ref{"mesg"};
+  $lc_start = $lc_ref->{"at"};
+  $lc_mesg = $lc_ref->{"mesg"};
+  $lc_totrout = $lc_ref->{"rtnom"};
   $lc_projend = int($lc_start + ( $_[1] * 60 ) + $_[2] + 0.2);
-  $$lc_ref{"at"} = $lc_projend;
-  $lc_code = &randomica::ranstrg(8);
-  $lc_prwcode = &randomica::ranstrg(8);
+  $lc_ref->{"at"} = $lc_projend;
+  $lc_code = &randomica::ranstrg(6);
+  $lc_prwcode = &randomica::ranstrg(6);
+  
+  # Purge pre-existing copies from the system:
+  &findmsg($lc_code);
+  &findmsg($lc_prwcode);
+  
   while ( &howremain($lc_projend,$lc_endure) )
   {
     if ( &findmsg($lc_code) )
     {
-      $$lc_ref{"at"} = &nowo;
+      $lc_ref->{"at"} = &nowo;
       &outptex("\n\nTASK ENDED EARLY: (Ringing part will be skipped.)");
       return;
     }
+    
+    # Here is what we do if a Process-wide interrupt is invoked:
     if ( &findmsg($lc_prwcode) )
     {
-      &justbesure;
+      &justbesure($lc_ref);
+      $lc_projend = $lc_ref->{"at"};
+      &findmsg($lc_prwcode);
     }
-    &outptex("\n\nTASK: " . $lc_mesg . ":\n" . $lc_code . " -- " . &parcesec($lc_endure));
+    
+    
+    # But now is the part where we output the basic message to
+    # the end-user:
+    &outptex("\n\n\n\n"
+      . "ROUTINE: " . $lc_totrout . ":\n\n"
+      . "TASK: " . $lc_mesg . ":\n\n" . &parcesec($lc_endure) . " -- " . $lc_code . "\n"
+    );
     &outptex("(Process-wide interrupt: " . $lc_prwcode . ")");
     if ( $lc_endure > 15 )
     {
-      &do_caf(40);
+      &do_q_caf(40,300,$lc_endure);
       sleep(5);
       if ( &findmsg($lc_code) )
       {
-        $$lc_ref{"at"} = &nowo;
+        $lc_ref->{"at"} = &nowo;
         &outptex("\n\nTASK ENDED EARLY: (Ringing part will be skipped.)");
         return;
       }
@@ -190,6 +267,60 @@ sub regmsg {
   &argola::wraprg_lst($lc_cm,$dbkfl);
   system("mkdir","-p",$cbkdr);
   system($lc_cm);
+}
+
+sub clear_msg {
+  system("rm","-rf",$dbkfl);
+}
+
+sub nex_msg {
+  my $lc_ret;
+  my $lc_cm;
+  my $lc_rs;
+  my @lc_al;
+  my $lc_each;
+  my $lc_when;
+  my $lc_what;
+  my $lc_fround;
+  
+  
+  if ( ! ( -f $dbkfl ) )
+  {
+    $_[0] = "";
+    return ( 1 > 2 );
+  }
+  
+  $lc_ret = "";
+  $lc_cm = "cat";
+  &argola::wraprg_lst($lc_cm,$dbkfl);
+  $lc_cm .= " 2> /dev/null";
+  $lc_rs = `$lc_cm`;
+  &clear_msg;
+  
+  $lc_fround = 10;
+  @lc_al = split(/\n/,$lc_rs);
+  foreach $lc_each (@lc_al)
+  {
+    ($lc_when,$lc_what) = split(/:/,$lc_each,2);
+    
+    if ( $lc_fround > 5 )
+    {
+      $lc_ret = $lc_what;
+    }
+    
+    if ( $lc_fround < 5 )
+    {
+      $lc_cm = "echo";
+      &argola::wraprg_lst($lc_cm,$lc_each);
+      $lc_cm .= " >>";
+      &argola::wraprg_lst($lc_cm,$dbkfl);
+      system($lc_cm);
+    }
+    
+    $lc_fround = 0;
+  }
+  $_[0] = $lc_ret;
+  return ( 2 > 1 );
 }
 
 sub findmsg {
@@ -245,6 +376,23 @@ sub do_caf {
   system(&shlc_caf($_[0]));
 }
 
+sub do_s_caf {
+  my $lc_cmd;
+  $lc_cmd = "( ( caffeinate -u -t";
+  &argola::wraprg_lst($lc_cmd,$_[0]);
+  $lc_cmd .= " &bg ) 2> /dev/null )";
+  system($lc_cmd);
+}
+
+sub do_q_caf {
+  if ( $_[1] > $_[2] )
+  {
+    &do_s_caf($_[0]);
+    return;
+  }
+  &do_caf($_[0]);
+}
+
 sub nowo {
   my $lc_ret;
   $lc_ret = `date +%s`;
@@ -253,9 +401,28 @@ sub nowo {
 }
 
 sub new_res {
+  my $lc_current;
+  my $lc_ret;
+  my $lc_arcon;
+  my $lc_nomos;
+  
+  $lc_arcon = @_;
+  $lc_nomos = "--";
+  if ( $lc_arcon > 0.5 ) { $lc_nomos = $_[0]; }
+  
+  $lc_current = &nowo;
+  
+  $lc_ret = { "at" => $lc_current, "from" => $lc_current, "rtnom" => $lc_nomos };
+  return $lc_ret;
+}
+
+
+sub res_age {
+  my $lc_res;
   my $lc_ret;
   
-  $lc_ret = { "at" => &nowo };
+  $lc_res = $_[0];
+  $lc_ret = int(($lc_res->{"at"} - $lc_res->{"from"}) + 0.2);
   return $lc_ret;
 }
 
@@ -321,10 +488,10 @@ sub advance_by_s {
   my $lc_to;
   my $lc_lft;
   $lc_ref = $_[0];
-  $lc_at = $$lc_ref{"at"};
+  $lc_at = $lc_ref->{"at"};
   
   $lc_to = int($lc_at + $_[1] + 0.2);
-  $$lc_ref{"at"} = $lc_to;
+  $lc_ref->{"at"} = $lc_to;
   
   &outptex($lc_at . " : " . $lc_to);
   
