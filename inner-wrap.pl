@@ -140,6 +140,8 @@ if ( -f $savefile )
   my $lc_cm;
   my $lc_cna;
   my @lc_cnb;
+  my $lc_remen;
+  my $lc_dcreased;
   
   $lc_cm = "cat";
   &argola::wraprg_lst($lc_cm,$savefile);
@@ -148,6 +150,28 @@ if ( -f $savefile )
   
   $btwinterv = $lc_cnb[1];
   #$btwinterv = `cat recnex.txt`; chomp($btwinterv);
+  
+  # Now for the decay process:
+  $lc_dcreased = ( 1 > 2 );
+  $lc_remen = int((&alarmica::nowo() - $lc_cnb[0]) + 0.2);
+  
+  #my $lc_dbai;
+  #$lc_dbai = 0;
+  
+  while ( $lc_remen > ( 60 * 60 * 24 ) )
+  {
+    $btwinterv = ( $btwinterv * .999 );
+    $lc_dcreased = ( 2 > 1 );
+    
+    #$lc_dbai = int($lc_dbai + 1.2);
+    #system("echo",$lc_dbai . ": " . $btwinterv . " :");
+    
+    
+    $lc_remen = int( ( $lc_remen - ( 60 * 60 ) ) + 0.2 );
+  }
+  if ( $lc_dcreased ) { $btwinterv = int($btwinterv); }
+  
+  
   
   $btwinterv = int($btwinterv + 0.3);
   if ( $btwinterv < 30 ) { $btwinterv = 30; }
