@@ -151,6 +151,14 @@ if ( -f $savefile )
   $btwinterv = $lc_cnb[1];
   #$btwinterv = `cat recnex.txt`; chomp($btwinterv);
   
+  # ################################ #
+  # ##  BEGIN DECAY PROCESS HERE  ## #
+  # ################################ #
+  # The decay process is the feature that allows a meditation
+  # span to gradually decrease if you go for an extended period
+  # of time without using this program. That way, when you
+  # return, it won't start out too tough for you.
+  
   # Now for the decay process:
   $lc_dcreased = ( 1 > 2 );
   $lc_remen = int((&alarmica::nowo() - $lc_cnb[0]) + 0.2);
@@ -167,10 +175,17 @@ if ( -f $savefile )
     #system("echo",$lc_dbai . ": " . $btwinterv . " :");
     
     
-    $lc_remen = int( ( $lc_remen - ( 60 * 60 ) ) + 0.2 );
+    # Originally, the decay-increment after a full day was a full
+    # hour - but experience has taught me that it needs to be
+    # decreased by a little bit.
+    $lc_remen = int( ( $lc_remen - ( 56 * 60 ) ) + 0.2 );
   }
   if ( $lc_dcreased ) { $btwinterv = int($btwinterv); }
   
+  
+  # ############################## #
+  # ##  END DECAY PROCESS HERE  ## #
+  # ############################## #
   
   
   $btwinterv = int($btwinterv + 0.3);
