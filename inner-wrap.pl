@@ -307,6 +307,9 @@ sleep(3);
 $regyet = 0;
 while ( 2 > 1 )
 {
+  my $lc_fara;
+  my $lc_farb;
+  
   &dovar(6);
   
   if ( $regyet < 5 )
@@ -324,6 +327,10 @@ while ( 2 > 1 )
         . &alarmica::parcesec(int(($nxbtwinterv * 3) + 0.2))
     );
   }
+  
+  $lc_fara = int(($btwinterv * 3) + 0.2);
+  $lc_farb = &alarmica::parcesec($lc_fara);
+  system("echo","               This time it was: " . $lc_farb);
   
   $regyet = 10;
 }
