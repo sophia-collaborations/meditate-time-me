@@ -346,6 +346,7 @@ while ( 2 > 1 )
   $lc_fara = int(($btwinterv * 3) + 0.2);
   $lc_farb = &alarmica::parcesec($lc_fara);
   system("echo","               This time it was: " . $lc_farb);
+  system("date");
   
   $regyet = 10;
 }
