@@ -315,7 +315,7 @@ sub dovar {
   my $lc_farb;
   $lc_fara = int(($btwinterv * 3) + 0.2);
   $lc_farb = &alarmica::parcesec($lc_fara);
-  system("echo","Preparing to meditate for: " . $lc_farb . ":");
+  system("echo","\nPreparing to meditate for: " . $lc_farb . ":\n");
 }
 
 
