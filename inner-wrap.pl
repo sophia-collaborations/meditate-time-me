@@ -308,6 +308,18 @@ sub dovar {
   }
 }
 
+
+# Announcement Before Meditation:
+{
+  my $lc_fara;
+  my $lc_farb;
+  $lc_fara = int(($btwinterv * 3) + 0.2);
+  $lc_farb = &alarmica::parcesec($lc_fara);
+  system("echo","Preparing to meditate for: " . $lc_farb . ":");
+}
+
+
+
 &goforward($prewait,"Prepare for Meditation");
 &stdring();
 &goforward($btwinterv,"Phase 1 of 3");
