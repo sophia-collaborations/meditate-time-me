@@ -10,6 +10,7 @@ my $short_alarm;
 my $volumos;
 my $regyet;
 my $difran;
+my @history_at = ();
 
 my $coraction = "x";
 my $corarguma;
@@ -124,6 +125,13 @@ sub acto__f_f {
   $savefile = &argola::getrg();
   $saveloca = 10;
 } &argola::setopt("-f",\&acto__f_f);
+
+
+
+sub acto__f_hst {
+  @history_at = ( @history_at, &argola::getrg() );
+} &argola::setopt("-hst",\&acto__f_hst);
+
 
 &argola::runopts();
 
@@ -336,8 +344,12 @@ while ( 2 > 1 )
 {
   my $lc_fara;
   my $lc_farb;
+  my $lc_nowrecord;
   
   &dovar(6);
+  
+  system("echo");
+  $lc_nowrecord = 0;
   
   if ( $regyet < 5 )
   {
@@ -346,6 +358,7 @@ while ( 2 > 1 )
     system("echo","REGISTERED INCREMENT TO NEXT TIME: "
         . &alarmica::parcesec(int(($nxbtwinterv * 3) + 0.2))
     );
+    $lc_nowrecord = 10;
   }
   
   if ( $regyet > 5 )
@@ -359,6 +372,27 @@ while ( 2 > 1 )
   $lc_farb = &alarmica::parcesec($lc_fara);
   system("echo","               This time it was: " . $lc_farb);
   system("date");
+  
+  if ( $lc_nowrecord > 5 )
+  {
+    my $lc2_date;
+    my $lc2_mesg;
+    my $lc2_ech;
+    my $lc2_cm;
+    $lc2_date = `date`; chomp($lc2_date);
+    $lc2_mesg = $lc2_date . ": " . $lc_farb;
+    foreach $lc2_ech (@history_at)
+    {
+      $lc2_cm = "echo";
+      &argola::wraprg_lst($lc2_cm,$lc2_mesg);
+      $lc2_cm .= " >>";
+      &argola::wraprg_lst($lc2_cm,$lc2_ech);
+      system($lc2_cm);
+    }
+  }
+  
+  
+  system("echo");
   
   $regyet = 10;
 }
