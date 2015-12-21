@@ -7,10 +7,16 @@ my $btwinterv;
 my $nxbtwinterv;
 my $curstat;
 my $short_alarm;
+my $prepping_chime;
 my $volumos;
 my $regyet;
 my $difran;
 my @history_at = ();
+
+my $interstep_prime = 15;
+my $presilence_prime = 60;
+my $interstep_last;
+my $interstep_act;
 
 my $coraction = "x";
 my $corarguma;
@@ -23,6 +29,7 @@ $difran = 0.03;
 $volumos = "0.01";
 
 $short_alarm = &alarmica::shlc_svol("0","0.02","0.04","0.08","0.14");
+$prepping_chime = &alarmica::shlc_svol("0","0.04","0.08","0.14");
 
 
 sub acto__f_rev {
@@ -269,6 +276,19 @@ sub diferen {
   return $lc_ret;
 }
 
+sub zenny {
+}
+
+sub prep_alarm {
+  my $lc_current;
+  
+  $lc_current = &alarmica::nowo();
+  if ( ( $lc_current - $interstep_last ) < $interstep_prime ) { return; }
+  if ( ( $curstat - $lc_current ) < $presilence_prime ) { return; }
+  system($prepping_chime);
+  $interstep_last = $lc_current;
+}
+
 sub goforward {
   my $lc_xar;
   my $lc_zlp;
@@ -276,6 +296,7 @@ sub goforward {
   $curstat = int($curstat + $_[0] + 0.2);
   while ( ( $lc_xar = &diferen() ) > 0.5 )
   {
+    &$interstep_act();
     $lc_zlp = 1;
     if ( $lc_xar > 8 )
     {
@@ -328,8 +349,14 @@ sub dovar {
 
 
 
+
+system($prepping_chime);
+$interstep_last = &alarmica::nowo();
+
+$interstep_act = \&prep_alarm;
 &goforward($prewait,"Prepare for Meditation");
 &stdring();
+$interstep_act = \&zenny;
 &goforward($btwinterv,"Phase 1 of 3");
 &stdring();
 &goforward($btwinterv,"Phase 2 of 3");
