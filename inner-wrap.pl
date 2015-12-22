@@ -134,6 +134,13 @@ sub acto__f_f {
 } &argola::setopt("-f",\&acto__f_f);
 
 
+# The -scrn option causes 'meditate-time-me' to run in the mode by
+# which the screen is prevented from falling asleep.
+sub acto__f_scrn {
+  &alarmica::set_caf_screen();
+} &argola::setopt("-scrn",\&acto__f_scrn);
+
+
 
 sub acto__f_hst {
   @history_at = ( @history_at, &argola::getrg() );
