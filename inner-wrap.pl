@@ -14,6 +14,7 @@ my $difran;
 my @history_at = ();
 
 my $interstep_prime = 15;
+my $interstep_ratio = ( 1 / 6 );
 my $presilence_prime = 60;
 my $interstep_last;
 my $interstep_act;
@@ -288,9 +289,18 @@ sub zenny {
 
 sub prep_alarm {
   my $lc_current;
+  my $lc_primate;
   
   $lc_current = &alarmica::nowo();
-  if ( ( $lc_current - $interstep_last ) < $interstep_prime ) { return; }
+  
+  $lc_primate = $interstep_prime;
+  {
+    my $lc2_a;
+    $lc2_a = int( ( $curstat - $lc_current ) * $interstep_ratio );
+    if ( $lc2_a > $lc_primate ) { $lc_primate = $lc2_a; }
+  }
+  
+  if ( ( $lc_current - $interstep_last ) < $lc_primate ) { return; }
   if ( ( $curstat - $lc_current ) < $presilence_prime ) { return; }
   system($prepping_chime);
   $interstep_last = $lc_current;
