@@ -12,6 +12,7 @@ my $volumos;
 my $regyet;
 my $difran;
 my @history_at = ();
+my $vol_incres = 20;
 
 my $interstep_prime = 15;
 my $interstep_ratio = ( 1 / 6 );
@@ -348,7 +349,10 @@ sub dovar {
     system("echo","Ending Bell Volume: " . $volumos);
     &alarmica::fg_invi_vol($volumos);
     sleep(3);
-    $volumos = ( $volumos * 1.2);
+    $volumos = ( $volumos * (1 + ($vol_incres / 100)));
+    if ( $volumos > 0.16 ) { $vol_incres = 10; }
+    if ( $volumos > 0.20 ) { $vol_incres = 5; }
+    if ( $volumos > 0.24 ) { $vol_incres = 3; }
     if ( $volumos > 1 ) { $volumos = 1; }
     $lc_a = int($lc_a - 0.8);
   }
