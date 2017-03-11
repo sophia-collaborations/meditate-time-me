@@ -135,6 +135,16 @@ sub acto__f_f {
   $saveloca = 10;
 } &argola::setopt("-f",\&acto__f_f);
 
+sub acto__f_tb {
+  if ( $saveloca < 5 ) { die("\nmeditate-time-me: FATAL ERROR:\n    Can not specify -tb option without prior -f option:\n\n"); }
+  system("cp",($savefile . '.bk001'),$savefile);
+  system("cp",($savefile . '.bk002'),($savefile . '.bk001'));
+  system("cp",($savefile . '.bk003'),($savefile . '.bk002'));
+  system("cp",($savefile . '.bk004'),($savefile . '.bk003'));
+  system("cp",($savefile . '.bk005'),($savefile . '.bk004'));
+  exec("meditate-time-me",'-f',$savefile,'-chk');
+} &argola::setopt("-tb",\&acto__f_tb);
+
 
 # The -scrn option causes 'meditate-time-me' to run in the mode by
 # which the screen is prevented from falling asleep.
@@ -370,6 +380,13 @@ sub dovar {
 }
 
 
+# BEGIN THE RECORD BACKUP PROCEDURE:
+system("cp",($savefile . '.bk004'),($savefile . '.bk005'));
+system("cp",($savefile . '.bk003'),($savefile . '.bk004'));
+system("cp",($savefile . '.bk002'),($savefile . '.bk003'));
+system("cp",($savefile . '.bk001'),($savefile . '.bk002'));
+system("cp",$savefile,($savefile . '.bk001'));
+# END THE RECORD BACKUP PROCEDURE:
 
 
 system($prepping_chime);
