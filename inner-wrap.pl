@@ -158,6 +158,13 @@ sub acto__f_hst {
   @history_at = ( @history_at, &argola::getrg() );
 } &argola::setopt("-hst",\&acto__f_hst);
 
+sub acto__f_hist {
+  my $lc_a;
+  $lc_a = @history_at;
+  if ( $lc_a < 0.5 ) { die "\nNO HISTORY FILE SPECIFIED:\n\n"; }
+  exec("cat",$history_at[0]);
+} &argola::setopt("-hist",\&acto__f_hist);
+
 
 &argola::runopts();
 
