@@ -1,6 +1,7 @@
 use strict;
 use argola;
 use alarmica;
+use wraprg;
 
 my $prewait;
 my $btwinterv;
@@ -19,6 +20,8 @@ my $interstep_ratio = ( 1 / 6 );
 my $presilence_prime = 60;
 my $interstep_last;
 my $interstep_act;
+
+my @stayfiles = ();
 
 my $coraction = "x";
 my $corarguma;
@@ -128,6 +131,15 @@ sub apre__f_in {
   &savingit($corarguma);
   exit(0);
 } &argola::setopt("-in",\&acto__f_in);
+
+
+sub acto__f_rqf {
+  my $lc_a;
+  my $lc_b;
+  $lc_a = &argola::getrg();
+  $lc_b = &argola::getrg();
+  @stayfiles = (@stayfiles,[$lc_a,$lc_b]);
+}; &argola::setopt('-rqf',\&acto__f_rqf);
 
 
 sub acto__f_f {
@@ -287,6 +299,19 @@ $prewait = $btwinterv;
 
 $curstat = &alarmica::nowo();
 
+
+sub noterupt {
+  my $lc_a;
+  my $lc_cm;
+  my $lc_con;
+  foreach $lc_a (@stayfiles)
+  {
+    $lc_cm = 'cat ' . &wraprg::bsc($lc_a->[0]) . ' 2> /dev/null';
+    $lc_con = `$lc_cm`; chomp($lc_con);
+    if ( $lc_con ne ($lc_a->[1]) ) { exit(0); }
+  }
+}
+
 sub stdring ( )
 {
   system("echo",": ------------------------------------- :");
@@ -342,6 +367,7 @@ sub goforward {
     system("echo",": " . $_[1] . ": " . $lc_visuo);
     &alarmica::do_caf(30);
     sleep($lc_zlp);
+    &noterupt();
   }
 }
 
@@ -366,6 +392,7 @@ sub dovar {
     system("echo","Ending Bell Volume: " . $volumos);
     &alarmica::fg_invi_vol($volumos);
     sleep(3);
+    &noterupt();
     $volumos = ( $volumos * (1 + ($vol_incres / 100)));
     if ( $volumos > 0.16 ) { $vol_incres = 10; }
     if ( $volumos > 0.19 ) { $vol_incres = 5; }
@@ -412,6 +439,7 @@ $interstep_act = \&zenny;
 &alarmica::do_caf(8);
 &alarmica::fg_invi_vol(0);
 sleep(3);
+&noterupt();
 $regyet = 0;
 while ( 2 > 1 )
 {
