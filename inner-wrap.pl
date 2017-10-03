@@ -177,6 +177,10 @@ sub acto__f_hist {
   exec("cat",$history_at[0]);
 } &argola::setopt("-hist",\&acto__f_hist);
 
+sub acto__bf_help {
+  exec('chobakwrap','-sub','browseropen','https://github.com/sophia-collaborations/meditate-time-me/blob/master/README.md');
+} &argola::setopt('--help',\&acto__bf_help);
+
 
 &argola::runopts();
 
