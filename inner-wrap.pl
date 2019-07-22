@@ -317,10 +317,10 @@ $prewait = $btwinterv;
 &zarin($prewait,70,3);
 &zarin($prewait,75,4);
 &zarin($prewait,80,5);
-&zarin($prewait,85,6);
-&zarin($prewait,90,7);
-&zarin($prewait,95,8);
-&zarin($prewait,100,9);
+&zarin($prewait,90,6);
+&zarin($prewait,100,7);
+&zarin($prewait,120,8);
+&zarin($prewait,140,9);
 
 
 
