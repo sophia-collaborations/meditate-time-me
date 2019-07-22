@@ -118,7 +118,7 @@ sub apre__f_set {
   
   $lc_b = int(($lc_a * 3) + 0.1);
   $lc_c = &alarmica::parcesec($lc_b);
-  system("echo","Advanced to: " . $lc_c);
+  system("echo","Manually Set to: " . $lc_c);
   exit(0);
 } &argola::setopt("-set",\&acto__f_set);
 
@@ -317,6 +317,10 @@ $prewait = $btwinterv;
 &zarin($prewait,70,3);
 &zarin($prewait,75,4);
 &zarin($prewait,80,5);
+&zarin($prewait,85,6);
+&zarin($prewait,90,7);
+&zarin($prewait,95,8);
+&zarin($prewait,100,9);
 
 
 
