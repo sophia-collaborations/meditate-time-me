@@ -103,6 +103,25 @@ sub apre__f_adv {
   exit(0);
 } &argola::setopt("-adv",\&acto__f_adv);
 
+sub acto__f_set {
+  $coraction = "set";
+  $corarguma = &argola::getrg();
+  $corarguma = int( ( $corarguma * 60 ) + &argola::getrg() + 0.2 );
+  $corarguma = int( ( $corarguma / 3 ) + 0.1 );
+}
+sub apre__f_set {
+  my $lc_a;
+  my $lc_b;
+  my $lc_c;
+  $lc_a = $corarguma;
+  &savingit($lc_a);
+  
+  $lc_b = int(($lc_a * 3) + 0.1);
+  $lc_c = &alarmica::parcesec($lc_b);
+  system("echo","Advanced to: " . $lc_c);
+  exit(0);
+} &argola::setopt("-set",\&acto__f_set);
+
 sub acto__f_chk {
   $coraction = "chk";
 }
@@ -257,6 +276,7 @@ if ( $coraction eq "adv" ) { &apre__f_adv(); }
 if ( $coraction eq "chk" ) { &apre__f_chk(); }
 if ( $coraction eq "out" ) { &apre__f_out(); }
 if ( $coraction eq "in" ) { &apre__f_in(); }
+if ( $coraction eq "set" ) { &apre__f_set(); }
 
 
 
