@@ -14,6 +14,7 @@ my $regyet;
 my $difran;
 my @history_at = ();
 my $vol_incres = 20;
+my $minimum_prep_time = 0;
 
 my $interstep_prime = 15;
 my $interstep_ratio = ( 1 / 6 );
@@ -200,6 +201,10 @@ sub acto__bf_help {
   exec('chobakwrap','-sub','browseropen','https://github.com/sophia-collaborations/meditate-time-me/blob/master/README.md');
 } &argola::setopt('--help',\&acto__bf_help);
 
+sub acto__f_mprep {
+  $minimum_prep_time = &argola::getrg();
+} &argola::setopt("-mprep",\&acto__f_mprep);
+
 
 &argola::runopts();
 
@@ -321,6 +326,7 @@ $prewait = $btwinterv;
 &zarin($prewait,100,7);
 &zarin($prewait,120,8);
 &zarin($prewait,140,9);
+if ( $prewait < $minimum_prep_time ) { $prewait = $minimum_prep_time; }
 
 
 
