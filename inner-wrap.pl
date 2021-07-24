@@ -9,6 +9,7 @@ my $nxbtwinterv;
 my $curstat;
 my $short_alarm;
 my $prepping_chime;
+my $x_prepping_chime;
 my $volumos;
 my $regyet;
 my $difran;
@@ -36,7 +37,7 @@ $volumos = "0.01";
 
 $short_alarm = &alarmica::shlc_svol("0","0.02","0.04","0.08","0.14");
 $prepping_chime = &alarmica::shlc_svol("0","0.04","0.08","0.14");
-
+$x_prepping_chime = &alarmica::shlc_svol("0","0.08");
 
 sub acto__f_rev {
   $coraction = "rev";
@@ -383,6 +384,50 @@ sub prep_alarm {
   $interstep_last = $lc_current;
 }
 
+sub preparation_sequence {
+  my $lc_xar;
+  my $lc_zlp;
+  my $lc_visuo;
+  my $lc_sounding;
+  my $lc_last_heard;
+  my $lc_now_hear;
+  
+  $lc_sounding = 10;
+  $lc_last_heard = ( time() - 10000 );
+  
+  $curstat = int($curstat + $_[0] + 0.2);
+  while ( ( $lc_xar = &diferen() ) > 0.5 )
+  {
+    if ( $lc_sounding > 5 )
+    {
+      if ( $lc_xar > 30.5 )
+      {
+        $lc_now_hear = time();
+        if ( ( $lc_now_hear - $lc_last_heard ) > 15.5 )
+        {
+          system($x_prepping_chime);
+          $lc_last_heard = $lc_now_hear;
+        }
+      }
+      else {
+        system($prepping_chime);
+        $lc_sounding = 0;
+      }
+    }
+    $lc_zlp = 1;
+    if ( $lc_xar > 20 )
+    {
+      $lc_zlp = 6;
+      #if ( $lc_xar > 25 ) { $lc_zlp = 10; }
+    }
+    $lc_visuo = &alarmica::parcesec($lc_xar);
+    system("echo",": " . $_[1] . ": " . $lc_visuo);
+    &alarmica::do_caf(30);
+    sleep($lc_zlp);
+    &noterupt();
+  }
+}
+
 sub goforward {
   my $lc_xar;
   my $lc_zlp;
@@ -457,11 +502,14 @@ system("cp",$savefile,($savefile . '.bk001'));
 # END THE RECORD BACKUP PROCEDURE:
 
 
-system($prepping_chime);
+#system($prepping_chime);
+print "\nDEBUG: ---- WHAT THE FRELLY FRELL\n";
 $interstep_last = &alarmica::nowo();
 
-$interstep_act = \&prep_alarm;
-&goforward($prewait,"Prepare for Meditation");
+#$interstep_act = \&prep_alarm;
+#&goforward($prewait,"Prepare for Meditation");
+
+&preparation_sequence($prewait,"Prepare for Meditation");
 &stdring();
 $interstep_act = \&zenny;
 &goforward($btwinterv,"Phase 1 of 3");
