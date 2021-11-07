@@ -22,6 +22,7 @@ my $interstep_ratio = ( 1 / 6 );
 my $presilence_prime = 60;
 my $interstep_last;
 my $interstep_act;
+my $full_span_alpha;
 
 my @stayfiles = ();
 
@@ -30,6 +31,8 @@ my $corarguma;
 
 my $savefile = "recnex.txt";
 my $saveloca = 0;
+
+$full_span_alpha = time();
 
 $difran = 0.03;
 
@@ -443,7 +446,7 @@ sub goforward {
       if ( $lc_xar > 25 ) { $lc_zlp = 10; }
     }
     $lc_visuo = &alarmica::parcesec($lc_xar);
-    system("echo",": " . $_[1] . ": " . $lc_visuo);
+    system("echo",": " . $_[1] . ": (" . $lc_visuo . ')');
     &alarmica::do_caf(30);
     sleep($lc_zlp);
     &noterupt();
@@ -462,13 +465,25 @@ sub savingit {
   system($lc_cm);
 }
 
+sub figuresofar {
+  my $lc_a;
+  my $lc_b;
+  my $lc_c;
+  $lc_a = time();
+  $lc_b = int(($lc_a - $full_span_alpha) + 0.2);
+  $lc_c = &alarmica::parcesec($lc_b);
+  return $lc_c;
+}
+
 sub dovar {
   my $lc_a;
+  my $lc_b;
   $lc_a = $_[0];
   while ( $lc_a > 0.5 )
   {
     &alarmica::do_caf(8);
-    system("echo","Ending Bell Volume: " . $volumos);
+    $lc_b = &figuresofar();
+    system("echo","Ending Bell Volume: " . $volumos . " : (" . $lc_b . ')');
     &alarmica::fg_invi_vol($volumos);
     sleep(3);
     &noterupt();
@@ -504,7 +519,7 @@ system("cp",$savefile,($savefile . '.bk001'));
 
 
 #system($prepping_chime);
-print "\nDEBUG: ---- WHAT THE FRELLY FRELL\n";
+#print "\nDEBUG: ---- WHAT THE FRELLY FRELL\n";
 $interstep_last = &alarmica::nowo();
 
 #$interstep_act = \&prep_alarm;
@@ -513,10 +528,13 @@ $interstep_last = &alarmica::nowo();
 &preparation_sequence($prewait,"Prepare for Meditation");
 &stdring();
 $interstep_act = \&zenny;
+#print "DEBUG 1: " . &figuresofar . "\n";
 &goforward($btwinterv,"Phase 1 of 3");
 &stdring();
+#print "DEBUG 2: " . &figuresofar . "\n";
 &goforward($btwinterv,"Phase 2 of 3");
 &stdring();
+#print "DEBUG 3: " . &figuresofar . "\n";
 &goforward($btwinterv,"Phase 3 of 3");
 
 &alarmica::do_caf(8);
